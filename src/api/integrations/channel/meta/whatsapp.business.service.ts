@@ -1148,7 +1148,9 @@ export class BusinessStartupService extends ChannelStartupService {
       return messageRaw;
     } catch (error) {
       const { message, status: statusCode, body } = extractGraphError(error);
-      this.logger.error(`[GraphSendError] status=${statusCode} body=${JSON.stringify(body)?.slice(0, 200)}`);
+      this.logger.error(
+        `[GraphSendError] status=${statusCode ?? 'unknown'} body=${JSON.stringify(body ?? null)?.slice(0, 200)}`,
+      );
       throw new BadRequestException(message);
     }
   }
@@ -1215,7 +1217,9 @@ export class BusinessStartupService extends ChannelStartupService {
       return res.data.id;
     } catch (error) {
       const { message, status, body } = extractGraphError(error);
-      this.logger.error(`[GraphSendError] status=${status} body=${JSON.stringify(body)?.slice(0, 200)}`);
+      this.logger.error(
+        `[GraphSendError] status=${status ?? 'unknown'} body=${JSON.stringify(body ?? null)?.slice(0, 200)}`,
+      );
       throw new InternalServerErrorException(message);
     }
   }
