@@ -96,7 +96,9 @@ export class TemplateService {
       }
     } catch (e) {
       const { message, status, body } = extractGraphError(e);
-      this.logger.error(`[GraphSendError] status=${status} body=${JSON.stringify(body)?.slice(0, 200)}`);
+      this.logger.error(
+        `[GraphSendError] status=${status ?? 'unknown'} body=${JSON.stringify(body ?? null)?.slice(0, 200)}`,
+      );
       return { message };
     }
   }
