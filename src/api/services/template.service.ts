@@ -3,6 +3,7 @@ import { TemplateDto } from '@api/dto/template.dto';
 import { PrismaRepository } from '@api/repository/repository.service';
 import { ConfigService, WaBusiness } from '@config/env.config';
 import { Logger } from '@config/logger.config';
+import { extractGraphError } from '@utils/extractGraphError';
 import axios from 'axios';
 
 import { WAMonitoringService } from './monitor.service';
@@ -94,8 +95,9 @@ export class TemplateService {
         return result.data;
       }
     } catch (e) {
-      this.logger.error(e.response.data);
-      return e.response.data.error;
+      const { message, status, body } = extractGraphError(e);
+      this.logger.error(`[GraphSendError] status=${status} body=${JSON.stringify(body)?.slice(0, 200)}`);
+      return { message };
     }
   }
 }

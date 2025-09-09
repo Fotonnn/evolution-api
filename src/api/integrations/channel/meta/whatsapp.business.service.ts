@@ -23,6 +23,7 @@ import { Events, wa } from '@api/types/wa.types';
 import { Chatwoot, ConfigService, Database, Openai, S3, WaBusiness } from '@config/env.config';
 import { BadRequestException, InternalServerErrorException } from '@exceptions';
 import { createJid } from '@utils/createJid';
+import { extractGraphError } from '@utils/extractGraphError';
 import { status } from '@utils/renderStatus';
 import axios from 'axios';
 import { arrayUnique, isURL } from 'class-validator';
@@ -1146,8 +1147,9 @@ export class BusinessStartupService extends ChannelStartupService {
 
       return messageRaw;
     } catch (error) {
-      this.logger.error(error);
-      throw new BadRequestException(error.toString());
+      const { message, status: statusCode, body } = extractGraphError(error);
+      this.logger.error(`[GraphSendError] status=${statusCode} body=${JSON.stringify(body)?.slice(0, 200)}`);
+      throw new BadRequestException(message);
     }
   }
 
@@ -1212,8 +1214,9 @@ export class BusinessStartupService extends ChannelStartupService {
       const res = await axios.post(url, formData, { headers });
       return res.data.id;
     } catch (error) {
-      this.logger.error(error.response.data);
-      throw new InternalServerErrorException(error?.toString() || error);
+      const { message, status, body } = extractGraphError(error);
+      this.logger.error(`[GraphSendError] status=${status} body=${JSON.stringify(body)?.slice(0, 200)}`);
+      throw new InternalServerErrorException(message);
     }
   }
 
